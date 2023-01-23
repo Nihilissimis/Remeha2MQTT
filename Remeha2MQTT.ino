@@ -129,13 +129,17 @@ bool getSampleData() {
 
   Serial.write(cmdSampleData,10);
   DEBUG_MSG("Sending 'request data' command to boiler");
-  delay(500); // wait for response
-
+  
+  int SerialTimeout = millis() + 1000; 
+  while (!Serial.available() && (SerialTimeout > millis()) ) {
+    delay(100); // wait for response
+  }
+  
   if (Serial.available()) {
     DEBUG_MSG("Data available for reading");
     
     int read = Serial.readBytes(rawData, 74)
-    DEBUG_MSG(String(read) + "Bytes received");
+    DEBUG_MSG(String(read) + " Bytes received");
     return(1);
 
   } else {
@@ -157,8 +161,6 @@ int decode (byte index, byte length, byte bit_index) {
   if (bit_index > 0) {
     bitVal = bitRead(byteVal,bit_index-1);
     return bitVal;
-  } else if (byteVal > 32767) {
-    return 65535;
   } else {
     return byteVal;
   }
@@ -236,11 +238,11 @@ void loop() {
     } // next value
 
     DEBUG_MSG(String("Waiting ") + String(changed_interval) + String(" ms"));
-    delay(changed_interval); //
+    delay(changed_interval); 
 
   } else {
     // nothing received wait and retry 
-    DEBUG_MSG(String("Waiting ") + String(failed_interval) + String(" ms"));
+    DEBUG_MSG(String("Failure - waiting ") + String(failed_interval) + String(" ms"));
     delay(failed_interval);
   }
 
