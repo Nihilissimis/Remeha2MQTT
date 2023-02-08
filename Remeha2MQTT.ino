@@ -16,32 +16,33 @@ int failed_interval = 1000; // on failure wait 1 sec and retry
 struct data {
   String name; // Variable name
   bool publish; // Publish to MQTT or not
+  int divide_by; // Divide value by (0: do not divide) 
   byte index; // Location in bytestring (start at 1)
   byte length;  // Number of bytes in bytestring
   byte bit_index; // If > 0: is bitmap (bit index starts at 1)
-  int value; // Values are int
-  int old_value; // Value change track
+  int16_t value; // Values are int
+  int16_t old_value; // Value change track
   unsigned long last_update; // Millis() last update
 };
 
 // struct array static data (name, publish, index, length, bit_index)
 data values[] = {
-  {"Aanvoer_temperatuur",1,7,2},{"Retour_temperatuur",1,9,2},{"Zonneboiler_temperatuur",0,11,2},{"Buiten_temperatuur",1,13,2},
-  {"Boiler_temperatuur",0,15,2},{"Automaat_temperatuur",0,19,2},{"Ruimte_temperatuur",0,21,2},{"CV_setpunt",1,23,2},
-  {"SWW_setpunt",1,25,2},{"Ruimte_setpunt",0,27,2},{"Ventilator_setpunt",1,29,2},{"Ventilator_toeren",1,31,2},
-  {"Ionisatie_stroom",0,33,1},{"Intern_setpunt",1,34,2},{"Beschikbaar_vermogen",0,36,1},{"Pomp_snelheid",1,37,1},
-  {"Gevraagd_vermogen",0,39,1},{"Geleverd_vermogen",0,40,1},
+  {"Aanvoer_temperatuur",1,100,7,2},{"Retour_temperatuur",1,100,9,2},{"Zonneboiler_temperatuur",0,100,11,2},{"Buiten_temperatuur",1,100,13,2},
+  {"Boiler_temperatuur",0,100,15,2},{"Automaat_temperatuur",0,100,19,2},{"Ruimte_temperatuur",0,100,21,2},{"CV_setpunt",1,100,23,2},
+  {"SWW_setpunt",1,100,25,2},{"Ruimte_setpunt",0,100,27,2},{"Ventilator_setpunt",1,0,29,2},{"Ventilator_toeren",1,0,31,2},
+  {"Ionisatie_stroom",0,0,33,1},{"Intern_setpunt",1,100,34,2},{"Beschikbaar_vermogen",0,0,36,1},{"Pomp_snelheid",1,0,37,1},
+  {"Gevraagd_vermogen",0,0,39,1},{"Geleverd_vermogen",0,0,40,1},
   // bitmaps
-  {"Modulerende_regelaar",0,43,1,1},{"Warmtevraag_modulerend",0,43,1,2},{"Warmtevraag_aan-uit",1,43,1,3},{"Vorstbeveiliging",0,43,1,4},
-  {"SWW_ecostand",0,43,1,5},{"SWW_blokkering",0,43,1,6},{"Anti_Legionella",0,43,1,7},{"SWW_warmtevraag",1,43,1,8},
-  {"Ingang_blokkerend",0,44,1,1},{"Ingang_vrijgave",0,44,1,2},{"Ionisatie",0,44,1,3},{"SWW_tapschakelaar",0,44,1,4},
-  {"Gasdruk_minimaal",0,44,1,6},{"CV_ingeschakeld",0,44,1,7},{"SWW_ingeschakeld",0,44,1,8},{"Gasklep",1,45,1,1},
-  {"Onsteking_actief",0,45,1,3},{"3-wegklep_positie",0,45,1,4},{"Externe_3-wegklep",0,45,1,5},{"Externe_gasklep",0,45,1,7},
-  {"Pomp_actief",1,46,1,1},{"Boilerpomp",0,46,1,2},{"Externe_CV_pomp",0,46,1,3},{"Status_rapport",0,46,1,5},
-  {"Opentherm_SmartPower",0,46,1,8},
+  {"Modulerende_regelaar",0,0,43,1,1},{"Warmtevraag_modulerend",0,0,43,1,2},{"Warmtevraag_aan-uit",1,0,43,1,3},{"Vorstbeveiliging",0,0,43,1,4},
+  {"SWW_ecostand",0,0,43,1,5},{"SWW_blokkering",0,0,43,1,6},{"Anti_Legionella",0,0,43,1,7},{"SWW_warmtevraag",1,0,43,1,8},
+  {"Ingang_blokkerend",0,0,44,1,1},{"Ingang_vrijgave",0,0,44,1,2},{"Ionisatie",0,0,44,1,3},{"SWW_tapschakelaar",0,0,44,1,4},
+  {"Gasdruk_minimaal",0,0,44,1,6},{"CV_ingeschakeld",0,0,44,1,7},{"SWW_ingeschakeld",0,0,44,1,8},{"Gasklep_dicht",1,0,45,1,1},
+  {"Onsteking_actief",0,0,45,1,3},{"3-wegklep_positie",0,0,45,1,4},{"Externe_3-wegklep",0,0,45,1,5},{"Externe_gasklep",0,0,45,1,7},
+  {"Pomp_actief",1,0,46,1,1},{"Boilerpomp",0,0,46,1,2},{"Externe_CV_pomp",0,0,46,1,3},{"Status_rapport",0,0,46,1,5},
+  {"Opentherm_SmartPower",0,0,46,1,8},
   // end bitmaps
-  {"Status",1,47,1},{"Vergrendeling",0,48,1},{"Blokkering",1,49,1},{"Sub-status",1,50,1},
-  {"Waterdruk",1,56,1},{"Regel_temperatuur",1,58,2},{"SWW_Tapdebiet",1,60,2},{"Solar_temperatuur",0,63,2}
+  {"Status",1,0,47,1},{"Vergrendeling",0,0,48,1},{"Blokkering",1,0,49,1},{"Sub-status",1,0,50,1},
+  {"Waterdruk",1,10,56,1},{"Regel_temperatuur",1,100,58,2},{"SWW_Tapdebiet",1,100,60,2},{"Solar_temperatuur",0,100,63,2}
 };
 
 ESPTelnet telnet; // ESPTelnet for debug 
@@ -151,7 +152,7 @@ bool getSampleData() {
 
 
 int decode (byte index, byte length, byte bit_index) {
-  int byteVal;
+  int16_t byteVal;
   int bitVal;
 
   while (length-- > 0) {
@@ -167,11 +168,16 @@ int decode (byte index, byte length, byte bit_index) {
 }
 
 bool publishMQTT(int i) {
-  char value[5];
+  char value[7];
   char topic[57];
   char buffer[30];
 
-  itoa(values[i].value,value,10); // convert int value to char 
+  if (values[i].divide_by > 0) {
+    dtostrf(float(values[i].value)/values[i].divide_by, 4, 2, value); // convert float value to char 
+  } else {
+    itoa(values[i].value,value,10); // convert int value to char 
+  }
+
 
   // concatenate and convert MQTT topic to String
   strcpy(topic,MQTT_PREFIX);
@@ -180,7 +186,7 @@ bool publishMQTT(int i) {
 
   // publish MQTT
   if (MQTTclient.publish(topic, value) ) {
-    DEBUG_MSG(String("Published: ") + topic + String(" -> ") + String(values[i].value));
+    DEBUG_MSG(String("Published: ") + topic + String(" -> ") + String(value));
     values[i].old_value = values[i].value;
     values[i].last_update = millis();
     return(1);
@@ -232,16 +238,16 @@ void loop() {
               (millis() - values[i].last_update > full_interval) 
             ) 
           ) { 
-        // value to publish
+        // topic value to publish
         publishMQTT(i);
       }
-    } // next value
+    } // next topic value
 
     DEBUG_MSG(String("Waiting ") + String(changed_interval) + String(" ms"));
     delay(changed_interval); 
 
   } else {
-    // nothing received wait and retry 
+    // nothing received; wait and retry 
     DEBUG_MSG(String("Failure - waiting ") + String(failed_interval) + String(" ms"));
     delay(failed_interval);
   }
