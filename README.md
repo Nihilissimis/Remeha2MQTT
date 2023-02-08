@@ -10,3 +10,6 @@ Currently the code checks at configurable intervals (in this code every 10s) for
 As the ESP-01 is typically not easily accessible during normal operation (being tucked away in the boiler), debugging information is provided over telnet using ESPtelnet, and OTA is enabled for software updates.
 
 The hardware used is an ESP-01 with a serial breakout board. This also performs voltage-level shifting from/to 3.3V and 5V. This also enables to power the ESP-01 from the boiler itself. 
+
+A lot of information (in Dutch) about connecting the hardware can be found here: 
+https://www.circuitsonline.net/forum/view/143911
