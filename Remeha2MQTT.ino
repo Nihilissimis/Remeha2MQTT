@@ -9,6 +9,8 @@ const byte cmdSampleData[10] = {0x02,0xfe,0x01,0x05,0x08,0x02,0x01,0x69,0xab,0x0
 
 byte rawData[74]; // Remeha boiler sends 74-byte messages
 
+int wifi_errorcount = 0;
+int mqtt_errorcount = 0;
 int changed_interval = 10000; // send updates for changed values every 10 seconds
 int full_interval = 300000; // send full updates every 5 minutes
 int failed_interval = 1000; // on failure wait 1 sec and retry
@@ -57,7 +59,8 @@ void setupWifi() {
   while (WiFi.status() != WL_CONNECTED) {
     DEBUG_MSG(".");
     delay(500);
-  }
+    if (wifi_errorcount++ > 10) ESP.reset();
+  } 
 }
 
 
@@ -119,6 +122,7 @@ void MQTTconnect() {
 
   while (! MQTTclient.connected()) {
     DEBUG_MSG(".");
+    if (mqtt_errorcount++ > 10) ESP.reset();
     delay(500);
   }
 }
@@ -173,7 +177,7 @@ bool publishMQTT(int i) {
   char buffer[30];
 
   if (values[i].divide_by > 0) {
-    dtostrf(float(values[i].value)/values[i].divide_by, 4, 2, value); // convert float value to char 
+    dtostrf(float(values[i].value)/values[i].divide_by, 4, 2, value); // divide and convert float value to char 
   } else {
     itoa(values[i].value,value,10); // convert int value to char 
   }
