@@ -13,3 +13,5 @@ The hardware used is an ESP-01 with a serial breakout board. This also performs 
 
 A lot of information (in Dutch) about connecting the hardware can be found here: 
 https://www.circuitsonline.net/forum/view/143911
+
+Update 25 Oct 2023: Updated code to support all modules (ID-Serial, Samples, Parameters, Counters). (Kudos to @RobertDeserranno for helping getting this done!)
