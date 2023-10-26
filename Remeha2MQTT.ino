@@ -311,7 +311,7 @@ void decode(byte modID, byte topicID) {
       uint8_t precision = topics[topicID].bit_prec;
       bool sign = topics[topicID].sign;
       bool endian = boilerModule[modID].endian;
-      int16_t intVal;
+      int32_t intVal;
 
       // decode 
       if (length == 1) {
@@ -336,7 +336,7 @@ void decode(byte modID, byte topicID) {
       // translate 
       if (intVal == -32768) {
         // value 0x8000: not available 
-        strcpy (output, "NA");
+        strcpy (output, "(n/a)");
       } else if (mply_div > 1) {
         // multiply as int, convert to output
         itoa((intVal * mply_div), output, 10);
